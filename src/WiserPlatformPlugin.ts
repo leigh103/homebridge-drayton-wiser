@@ -14,8 +14,11 @@ import {
 } from '@string-bean/drayton-wiser-client';
 import { WiserThermostatAccessory } from './WiserThermostatAccessory';
 import { WiserAwaySwitch } from './WiserAwaySwitch';
+import { BoostOptions } from './RoomBoost';
 
 const POLL_INTERVAL = 60 * 1000;
+const DEFAULT_BOOST_DURATION = 60;
+const DEFAULT_BOOST_TEMPERATURE = 2;
 
 export class WiserPlatformPlugin implements DynamicPlatformPlugin {
   private updateSubscription?: Subscription;
@@ -23,6 +26,7 @@ export class WiserPlatformPlugin implements DynamicPlatformPlugin {
 
   // config options
   private readonly hideAwayButton?: boolean;
+  private readonly boost?: BoostOptions;
 
   // homebridge accessories
   private readonly accessories: Map<string, PlatformAccessory> = new Map();
@@ -67,6 +71,14 @@ export class WiserPlatformPlugin implements DynamicPlatformPlugin {
     }
 
     this.hideAwayButton = config.hideAwayButton;
+
+    if (!config.hideBoostSwitches) {
+      this.boost = {
+        durationMinutes: config.boostDuration ?? DEFAULT_BOOST_DURATION,
+        temperatureIncrease:
+          config.boostTemperature ?? DEFAULT_BOOST_TEMPERATURE,
+      };
+    }
 
     log.info('Loading Drayton Wiser platform');
 
@@ -249,6 +261,7 @@ export class WiserPlatformPlugin implements DynamicPlatformPlugin {
           <WiserClient>this.wiserClient,
           room,
           primaryDevice,
+          this.boost,
         ),
       );
     }
