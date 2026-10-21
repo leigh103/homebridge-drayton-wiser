@@ -1,12 +1,16 @@
 import { BaseAccessory } from './BaseAccessory';
-import { CharacteristicValue, Logger, PlatformAccessory } from 'homebridge';
+import {
+  CharacteristicValue,
+  HAP,
+  Logger,
+  PlatformAccessory,
+} from 'homebridge';
 import {
   Device,
   Room,
   RoomMode,
   WiserClient,
 } from '@string-bean/drayton-wiser-client';
-import { HAP } from 'homebridge/lib/api';
 import { BatteryLevel } from '@string-bean/drayton-wiser-client/dist/api/BatteryLevel';
 
 const MIN_SET_POINT = 5;
