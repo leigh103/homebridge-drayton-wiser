@@ -9,6 +9,11 @@ import {
 import { HAP } from 'homebridge/lib/api';
 import { BatteryLevel } from '@string-bean/drayton-wiser-client/dist/api/BatteryLevel';
 
+const MIN_SET_POINT = 5;
+const MAX_SET_POINT = 30;
+// used when switching a room from off to heat, as wiser has no set point for it
+const DEFAULT_HEAT_SET_POINT = 20;
+
 export class WiserThermostatAccessory extends BaseAccessory {
   constructor(
     accessory: PlatformAccessory,
@@ -61,13 +66,13 @@ export class WiserThermostatAccessory extends BaseAccessory {
       serviceType: hap.Service.Thermostat,
       characteristicType: Characteristic.TargetTemperature,
       getter: () => {
-        return this.room.setTemperature;
+        return this.room.setTemperature ?? MIN_SET_POINT;
       },
       setter: this.setTargetTemperature.bind(this),
       props: {
-        minValue: 5,
+        minValue: MIN_SET_POINT,
         minStep: 0.5,
-        maxValue: 30,
+        maxValue: MAX_SET_POINT,
       },
     });
 
@@ -112,7 +117,7 @@ export class WiserThermostatAccessory extends BaseAccessory {
       this.updateCharacteristic({
         serviceType: this.hap.Service.Thermostat,
         characteristicType: this.hap.Characteristic.TargetTemperature,
-        value: room.temperature ? room.temperature : 0,
+        value: room.setTemperature ?? MIN_SET_POINT,
       });
     }
 
@@ -164,7 +169,7 @@ export class WiserThermostatAccessory extends BaseAccessory {
       case this.hap.Characteristic.TargetHeatingCoolingState.HEAT:
         postUpdate = this.client.overrideRoomSetPoint(
           this.room.id,
-          this.room.setTemperature!,
+          this.room.setTemperature ?? DEFAULT_HEAT_SET_POINT,
         );
         break;
 

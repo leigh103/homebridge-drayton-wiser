@@ -201,7 +201,7 @@ export class WiserPlatformPlugin implements DynamicPlatformPlugin {
     );
 
     if (room.roomStatId) {
-      devices.push(
+      matched.push(
         ...devices.filter((device) => room.roomStatId === device.id),
       );
     }
@@ -254,7 +254,7 @@ export class WiserPlatformPlugin implements DynamicPlatformPlugin {
     }
 
     const thermostat = <WiserThermostatAccessory>this.thermostats.get(uuid);
-    thermostat.update(room);
+    thermostat.update(room, primaryDevice);
 
     return [accessory, newAccessory];
   }
